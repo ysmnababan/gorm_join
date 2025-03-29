@@ -1,0 +1,25 @@
+version: "0.1"
+database:
+  # consult[https://gorm.io/docs/connecting_to_the_database.html]"
+  dsn: "host=localhost user=admin password=password dbname=mydatabase port=5433 sslmode=disable TimeZone=Asia/Shanghai"
+  # input mysql or postgres or sqlite or sqlserver. consult[https://gorm.io/docs/connecting_to_the_database.html]
+  db: "postgres"
+  # enter the required data table or leave it blank. You can input : orders, users, goods
+  tables: 
+    - navigation
+    - roles
+    - roles_navigation
+  # specify a directory for output
+  outPath: "./query"
+  # query code file name, default: gen.go
+  outFile: ""
+  # generate unit test for query code
+  withUnitTest: true
+  # generated model code's package name
+  modelPkgName: ""
+  # generate with pointer when field is nullable
+  fieldNullable: true
+  # generate field with gorm index tag
+  fieldWithIndexTag: true
+  # generate field with gorm column type tag
+  fieldWithTypeTag: true
