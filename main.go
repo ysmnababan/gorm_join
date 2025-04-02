@@ -10,19 +10,20 @@ import (
 
 // Company has many Users
 type Company struct {
-	ID   uint   `gorm:"primaryKey" json:"id"`
-	Name string `gorm:"size:100" json:"name"`
+	CompID uint   `gorm:"column:id;primaryKey" json:"id"`
+	Name   string `gorm:"size:100" json:"name"`
 
-	Users []User `gorm:"foreignKey:CompanyID" json:"users"`
+	// Users []User `gorm:"foreignKey:IDPerusahaan;references:CompID" json:"users"`
+	Users []User `gorm:"foreignKey:IDPerusahaan" json:"users"` // you don't have to add the references tag
 }
 
 // User belongs to a Company and has many Orders
 type User struct {
-	ID        uint    `gorm:"primaryKey" json:"id"`
-	Name      string  `gorm:"size:100" json:"name"`
-	Age       int     `json:"age"`
-	CompanyID uint    `json:"company_id"`
-	Company   Company `gorm:"foreignKey:CompanyID" json:"company"`
+	ID           uint     `gorm:"primaryKey" json:"id"`
+	Name         string   `gorm:"size:100" json:"name"`
+	Age          int      `json:"age"`
+	IDPerusahaan uint     `json:"company_id" gorm:"column:company_id"`
+	Company      *Company `gorm:"foreignKey:IDPerusahaan;references:CompID" json:"company"`
 
 	Orders []Order `gorm:"foreignKey:UserID" json:"orders"`
 }
@@ -49,9 +50,9 @@ func seedData(db *gorm.DB) error {
 	db.Create(&company2)
 
 	// Create Users
-	user1 := User{Name: "Alice", Age: 30, CompanyID: company1.ID}
-	user2 := User{Name: "Bob", Age: 25, CompanyID: company2.ID}
-	user3 := User{Name: "Charlie", Age: 35, CompanyID: company1.ID}
+	user1 := User{Name: "Alice", Age: 30, IDPerusahaan: company1.CompID}
+	user2 := User{Name: "Bob", Age: 25, IDPerusahaan: company2.CompID}
+	user3 := User{Name: "Charlie", Age: 35, IDPerusahaan: company1.CompID}
 	db.Create(&user1)
 	db.Create(&user2)
 	db.Create(&user3)
@@ -85,8 +86,8 @@ func main() {
 	users := []User{}
 	res := db.
 		Joins("Company").
-		Joins("LEFT JOIN orders ON orders.user_id = users.id AND orders.id is null ").
-		Select(`users.*, "Company"."id" AS "Company__id", "Company"."name" AS "Company__name", orders.id AS Order__id, orders.amount AS Order__amount`).
+		// Joins("LEFT JOIN orders ON orders.user_id = users.id AND orders.id is null ").
+		// Select(`users.*, "Company"."id" AS "Company__id", "Company"."name" AS "Company__name", orders.id AS Order__id, orders.amount AS Order__amount`).
 		Find(&users)
 	if res.Error != nil {
 		fmt.Println(res.Error)
